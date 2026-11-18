@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}{{ heading }} · Cream of the Cream{% endblock %}
+
+{% block content %}
+  <a class="back" href="{% if person %}{% url 'connection-detail' person.id %}{% else %}{% url 'people' %}{% endif %}">Back</a>
+  <header class="page-head">
+    <div>
+      <p class="kicker">People</p>
+      <h1>{{ heading }}</h1>
+    </div>
+  </header>
+  <form method="post" class="stack form-card">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+    {% include "connections/_field.html" with field=form.name %}
+    {% include "connections/_field.html" with field=form.headline %}
+    <div class="split">
+      {% include "connections/_field.html" with field=form.location %}
+      {% include "connections/_field.html" with field=form.email %}
+    </div>
+    <div class="split">
+      {% include "connections/_field.html" with field=form.phone %}
+      {% include "connections/_field.html" with field=form.avatar_url %}
+    </div>
+    {% include "connections/_field.html" with field=form.bio %}
+    {% include "connections/_field.html" with field=form.notes %}
+    <fieldset>
+      <legend>Profiles</legend>
+      <p class="hint">Links only. These sites are opened by you. They are not scraped.</p>
+      {% for platform, url in form.link_slots %}
+        <div class="link-row">
+          <div class="field">
+            <label class="sr-only" for="{{ platform.id_for_label }}">Platform</label>
+            {{ platform }}
+            {% for error in platform.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+          </div>
+          <div class="field">
+            <label class="sr-only" for="{{ url.id_for_label }}">Profile URL</label>
+            {{ url }}
+            {% for error in url.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+    </fieldset>
+    {% include "connections/_field.html" with field=form.rss_url %}
+    <label class="check">
+      {{ form.is_favorite }}
+      <span>{{ form.is_favorite.label }}</span>
+    </label>
+    {% for error in form.is_favorite.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    <button class="button" type="submit">{% if person %}Save changes{% else %}Add person{% endif %}</button>
+  </form>
+  {% if person %}
+    <form method="post" action="{% url 'connection-delete' person.id %}" class="danger-zone" onsubmit="return confirm('Remove {{ person.name|escapejs }} from your list?');">
+      {% csrf_token %}
+      <button class="button danger" type="submit">Remove from list</button>
+    </form>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Save a post · {{ person.name }}{% endblock %}
+
+{% block content %}
+  <a class="back" href="{% url 'connection-detail' person.id %}">Back to {{ person.name }}</a>
+  <header class="page-head">
+    <div>
+      <p class="kicker">{{ person.name }}</p>
+      <h1>Save a post</h1>
+    </div>
+  </header>
+  <form method="post" class="stack form-card">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+    {% include "connections/_field.html" with field=form.body %}
+    {% include "connections/_field.html" with field=form.title %}
+    <div class="split">
+      {% include "connections/_field.html" with field=form.platform %}
+      {% include "connections/_field.html" with field=form.posted_at %}
+    </div>
+    {% include "connections/_field.html" with field=form.external_url %}
+    <label class="check">
+      {{ form.is_highlight }}
+      <span>{{ form.is_highlight.label }}</span>
+    </label>
+    <button class="button" type="submit">Save post</button>
+  </form>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>{% block title %}Cream of the Cream{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,560;1,9..144,560&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+  <a class="skip" href="#content">Skip to content</a>
+  <header class="top">
+    <div class="top-inner">
+      <a class="wordmark" href="{% url 'home' %}"><span>Cream</span> of the Cream</a>
+      {% if signed_in %}
+        <nav class="nav" aria-label="Primary">
+          {% with name=request.resolver_match.url_name %}
+            <a href="{% url 'home' %}" {% if name == 'home' %}aria-current="page"{% endif %}>Today</a>
+            <a href="{% url 'people' %}" {% if name == 'people' or name == 'connection-detail' or name == 'connection-create' or name == 'connection-edit' or name == 'post-create' %}aria-current="page"{% endif %}>People</a>
+            <a href="{% url 'connection-create' %}">Add</a>
+          {% endwith %}
+        </nav>
+        <div class="account">
+          <span class="who">{{ current_email }}</span>
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button class="text-button" type="submit">Sign out</button>
+          </form>
+        </div>
+      {% else %}
+        <nav class="nav" aria-label="Account">
+          <a href="{% url 'login' %}" {% if request.resolver_match.url_name == 'login' %}aria-current="page"{% endif %}>Sign in</a>
+          <a href="{% url 'signup' %}" {% if request.resolver_match.url_name == 'signup' %}aria-current="page"{% endif %}>Create account</a>
+        </nav>
+      {% endif %}
+    </div>
+  </header>
+  {% if demo_session %}
+    <p class="banner">Sample roster on this computer. Connect Supabase before anyone else uses it.</p>
+  {% endif %}
+  <main id="content" class="shell">
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li class="message {{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

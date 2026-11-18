@@ -1,0 +1,20 @@
+{% load connections_tags %}
+<li data-person="{{ person.name|lower }} {{ person.headline|lower }} {{ person.location|lower }} {{ person.email|lower }}">
+  <a class="row" href="{% url 'connection-detail' person.id %}">
+    {% include "connections/_avatar.html" %}
+    <span class="row-copy">
+      <span class="row-name">{{ person.name }}</span>
+      <span class="row-sub">
+        {% if person.headline %}
+          {{ person.headline }}
+        {% elif person.location %}
+          {{ person.location }}
+        {% else %}
+          {% with link=person.links.all|first %}
+            {% if link %}{{ link.get_platform_display }}{% endif %}
+          {% endwith %}
+        {% endif %}
+      </span>
+    </span>
+  </a>
+</li>

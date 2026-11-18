@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}People · Cream of the Cream{% endblock %}
+
+{% block content %}
+  <header class="page-head">
+    <div>
+      <p class="kicker">Contacts</p>
+      <h1>People</h1>
+    </div>
+    <a class="button" href="{% url 'connection-create' %}">Add a person</a>
+  </header>
+  <form class="search" method="get" action="{% url 'people' %}">
+    <label class="sr-only" for="people-search">Search people</label>
+    <input id="people-search" type="search" name="q" value="{{ query }}" placeholder="Search" autocomplete="off">
+  </form>
+  <p id="empty-search" class="empty" hidden>No one matches that search.</p>
+  {% if query and not groups %}
+    <p class="empty">No one matches that search.</p>
+  {% endif %}
+
+  <div class="people-wrap">
+    {% if favorites %}
+      <section data-favorites>
+        <h2 class="letter">Favorites</h2>
+        <ul class="people">
+          {% for person in favorites %}
+            {% include "connections/_person_row.html" %}
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+    {% for group in groups %}
+      <section id="letter-{{ group.anchor }}" data-letter-group>
+        <h2 class="letter">{{ group.letter }}</h2>
+        <ul class="people">
+          {% for person in group.people %}
+            {% include "connections/_person_row.html" %}
+          {% endfor %}
+        </ul>
+      </section>
+    {% endfor %}
+    {% if not groups and not query %}
+      <p class="empty">Your list is empty. <a href="{% url 'connection-create' %}">Add someone</a>.</p>
+    {% endif %}
+  </div>
+
+  <nav class="alpha" aria-label="Jump to letter">
+    {% for entry in alphabet %}
+      {% if entry.present %}
+        <a href="#letter-{{ entry.anchor }}">{{ entry.letter }}</a>
+      {% else %}
+        <span>{{ entry.letter }}</span>
+      {% endif %}
+    {% endfor %}
+  </nav>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'js/people.js' %}"></script>
+{% endblock %}

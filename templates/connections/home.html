@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load connections_tags %}
+
+{% block title %}Today · Cream of the Cream{% endblock %}
+
+{% block content %}
+  <div class="stage">
+    <section class="panel" aria-labelledby="today-heading">
+      <header class="panel-head">
+        <div>
+          <p class="kicker">{% if showing_latest %}Latest{% else %}Today{% endif %}</p>
+          <h1 id="today-heading">{% if showing_latest %}Nothing new today{% else %}Top of the day{% endif %}</h1>
+        </div>
+        <p class="date">{{ today|date:"l, N j" }}</p>
+      </header>
+      {% if showing_latest and posts %}
+        <p class="hint">These are the newest posts already on the list.</p>
+      {% endif %}
+      {% if posts %}
+        <div class="post-grid">
+          {% for post in posts %}
+            <article class="post">
+              <p class="post-kicker">
+                {% if post.is_highlight %}<span class="pin">Pinned</span>{% endif %}
+                {{ post.get_platform_display }}
+                · {{ post.posted_at|date:"N j, P" }}
+              </p>
+              <h2><a href="{% url 'connection-detail' post.connection.id %}">{{ post.connection.name }}</a></h2>
+              {% if post.title %}<p class="post-title">{{ post.title }}</p>{% endif %}
+              <p>{{ post.body|excerpt }}</p>
+              {% if post.external_url %}
+                <a class="text-link" href="{{ post.external_url }}" target="_blank" rel="noopener noreferrer">Open original</a>
+              {% endif %}
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="empty">Save a post from someone's page and it will show up here.</p>
+      {% endif %}
+    </section>
+
+    <section class="panel" aria-labelledby="rotation-heading">
+      <header class="panel-head">
+        <div>
+          <p class="kicker">People</p>
+          <h2 id="rotation-heading">In rotation</h2>
+        </div>
+        <a class="text-link" href="{% url 'people' %}">All people</a>
+      </header>
+      {% if popular %}
+        <div class="rotation-grid">
+          {% for person in popular %}
+            <a class="person-card" href="{% url 'connection-detail' person.id %}">
+              {% include "connections/_avatar.html" %}
+              <span class="row-copy">
+                <span class="row-name">{{ person.name }}</span>
+                <span class="row-sub">
+                  {% if person.headline %}{{ person.headline }}{% elif person.location %}{{ person.location }}{% endif %}
+                </span>
+                <span class="row-meta">
+                  {% if person.recent_posts %}
+                    {{ person.recent_posts }} this week
+                  {% elif person.is_favorite %}
+                    Favorite
+                  {% else %}
+                    On your list
+                  {% endif %}
+                </span>
+              </span>
+            </a>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="empty"><a href="{% url 'connection-create' %}">Add the first person</a> you want to keep up with.</p>
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}

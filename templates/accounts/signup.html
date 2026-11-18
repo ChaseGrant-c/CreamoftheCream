@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Create account · Cream of the Cream{% endblock %}
+
+{% block content %}
+  <section class="auth-card">
+    <p class="kicker">Focus list</p>
+    <h1>Create an account</h1>
+    <p class="lede">Supabase keeps the login. This app keeps the people and the posts you save.</p>
+    <form method="post" class="stack">
+      {% csrf_token %}
+      {% include "connections/_field.html" with field=form.email %}
+      {% include "connections/_field.html" with field=form.password %}
+      {% include "connections/_field.html" with field=form.password_confirm %}
+      {% if form.non_field_errors %}
+        <div class="form-errors">{{ form.non_field_errors }}</div>
+      {% endif %}
+      <button class="button" type="submit">Create account</button>
+    </form>
+    <p class="hint">Already have one? <a href="{% url 'login' %}">Sign in</a>.</p>
+  </section>
+{% endblock %}
