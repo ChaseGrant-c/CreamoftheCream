@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import redirect, render
-from django.views.decorators.http import require_http_methods, require_POST
+from django.urls import reverse
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from apps.accounts.decorators import safe_next
 from apps.accounts.forms import LoginForm, SignupForm
@@ -50,7 +51,11 @@ def signup_view(request):
     form = SignupForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         try:
-            session = sign_up(form.cleaned_data["email"], form.cleaned_data["password"])
+            session = sign_up(
+                form.cleaned_data["email"],
+                form.cleaned_data["password"],
+                redirect_to=request.build_absolute_uri(reverse("auth-confirmed")),
+            )
         except EmailConfirmationRequired:
             messages.info(request, "Check your email for a confirmation from Supabase, then sign in.")
             return redirect("login")
@@ -63,6 +68,12 @@ def signup_view(request):
             messages.success(request, "Account created.")
             return redirect("home")
     return render(request, "accounts/signup.html", {"form": form})
+
+
+@require_GET
+def confirmed_view(request):
+    description = (request.GET.get("error_description") or "").replace("+", " ").strip()
+    return render(request, "accounts/confirmed.html", {"confirm_error": description})
 
 
 @require_POST

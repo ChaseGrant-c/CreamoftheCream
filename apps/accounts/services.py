@@ -47,10 +47,13 @@ def sign_in(email, password):
     return _session_from(response, email)
 
 
-def sign_up(email, password):
+def sign_up(email, password, redirect_to=""):
     client = _client()
+    credentials = {"email": email, "password": password}
+    if redirect_to:
+        credentials["options"] = {"email_redirect_to": redirect_to}
     try:
-        response = client.auth.sign_up({"email": email, "password": password})
+        response = client.auth.sign_up(credentials)
     except Exception as exc:
         logger.warning("Supabase sign-up failed: %s", exc.__class__.__name__)
         raise AuthError("Could not create that account. If you already signed up, try signing in.") from exc

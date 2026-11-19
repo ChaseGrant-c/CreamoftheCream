@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Email confirmation · Cream of the Cream{% endblock %}
+
+{% block content %}
+  <section class="auth-card">
+    <p class="kicker">Focus list</p>
+    {% if confirm_error %}
+      <h1>That link did not finish</h1>
+      <p class="lede" id="confirm-detail">{{ confirm_error }}</p>
+    {% else %}
+      <h1>Email confirmed</h1>
+      <p class="lede" id="confirm-detail">Your account is ready. Sign in with the same email and password.</p>
+    {% endif %}
+    <p class="hint"><a href="{% url 'login' %}">Sign in</a></p>
+  </section>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    const detail = document.getElementById("confirm-detail");
+    const params = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    const description = (params.get("error_description") || "").replace(/\+/g, " ").trim();
+    if (description && detail) {
+      detail.textContent = description;
+      const heading = document.querySelector(".auth-card h1");
+      if (heading) heading.textContent = "That link did not finish";
+    }
+  </script>
+{% endblock %}
